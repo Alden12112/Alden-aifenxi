@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 体育胜率分析台</title>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="stylesheet" href="./styles.css?v=3">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">AI Sports Prediction · Malaysia Time</p>
+      <h1>AI 体育胜率分析台</h1>
+    </div>
+    <div class="clock">
+      <span>马来西亚时间</span>
+      <strong id="liveClock">--:--</strong>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">赛程 · 胜率 · 盘口 · 倒计时</p>
+        <h2 id="headlineMatch">正在读取比赛...</h2>
+        <p id="headlineMeta">所有时间自动转换为马来西亚时间 MYT / UTC+8。</p>
+
+        <div class="countdown-strip">
+          <div>
+            <span>下一场比赛</span>
+            <strong id="nextMatchName">正在计算...</strong>
+          </div>
+          <div>
+            <span>距离开赛</span>
+            <strong id="nextCountdown">--</strong>
+          </div>
+          <div>
+            <span>距离早上 6:00</span>
+            <strong id="sixCountdown">--</strong>
+          </div>
+          <div>
+            <span>预计结束</span>
+            <strong id="nextEndTime">--</strong>
+          </div>
+        </div>
+
+        <div class="sport-tabs" role="tablist" aria-label="运动项目">
+          <button class="sport-tab active" data-sport="worldcup" type="button">世界杯</button>
+          <button class="sport-tab" data-sport="nba" type="button">NBA</button>
+        </div>
+      </div>
+      <div class="hero-score" aria-live="polite">
+        <span id="heroTeamA">-</span>
+        <strong id="heroScore">- : -</strong>
+        <span id="heroTeamB">-</span>
+      </div>
+    </section>
+
+    <section class="workspace compact">
+      <aside class="panel filters">
+        <label for="searchInput">搜索球队或城市</label>
+        <input id="searchInput" type="search" placeholder="例如 Brazil、Knicks、Dallas">
+
+        <label for="dateFilter">比赛日</label>
+        <select id="dateFilter"></select>
+
+        <label for="stageFilter">阶段</label>
+        <select id="stageFilter">
+          <option value="all">全部</option>
+          <option value="Group">小组赛</option>
+          <option value="Knockout">淘汰赛</option>
+        </select>
+
+        <div class="toggle-row">
+          <input id="marketOnly" type="checkbox">
+          <label for="marketOnly">只看有公开赔率</label>
+        </div>
+
+        <div class="toggle-row">
+          <input id="hideEnded" type="checkbox" checked>
+          <label for="hideEnded">比赛结束后自动消失</label>
+        </div>
+
+        <button id="refreshBtn" class="refresh-button" type="button">刷新市场</button>
+
+        <div class="source-box">
+          <strong>实时数据</strong>
+          <span id="refreshStatus">准备联网刷新赛程和赔率。</span>
+        </div>
+      </aside>
+
+      <section class="match-list" id="matchList" aria-label="比赛列表"></section>
+
+      <section class="panel prediction" id="predictionPanel">
+        <div class="prediction-head">
+          <div>
+            <p class="eyebrow" id="selectedStage">AI 预测</p>
+            <h2 id="selectedTitle">选择一场比赛</h2>
+          </div>
+          <button id="webSearchBtn" class="icon-button" title="上网搜索这场比赛">搜索</button>
+        </div>
+
+        <nav class="view-tabs" aria-label="分析页面">
+          <button class="view-tab active" data-view="summary" type="button">预测</button>
+          <button class="view-tab" data-view="deep" type="button">深度</button>
+          <button class="view-tab" data-view="settings" type="button">设置</button>
+        </nav>
+
+        <div class="view-panel active" data-panel="summary">
+          <div class="match-time-card">
+            <div><span>开赛</span><strong id="selectedStartTime">--</strong></div>
+            <div><span>结束</span><strong id="selectedEndTime">--</strong></div>
+            <div><span>倒计时</span><strong id="selectedCountdown">--</strong></div>
+          </div>
+
+          <div class="scoreline">
+            <div><span id="teamAName">主队</span><strong id="teamAGoals">0</strong></div>
+            <span>:</span>
+            <div><span id="teamBName">客队</span><strong id="teamBGoals">0</strong></div>
+          </div>
+
+          <div class="prob-grid">
+            <div><span id="teamAProbLabel">主队赢</span><strong id="teamAProb">--%</strong></div>
+            <div><span id="middleProbLabel">平局</span><strong id="drawProb">--%</strong></div>
+            <div><span id="teamBProbLabel">客队赢</span><strong id="teamBProb">--%</strong></div>
+          </div>
+
+          <div class="bars">
+            <div><span id="barA"></span></div>
+            <div><span id="barD"></span></div>
+            <div><span id="barB"></span></div>
+          </div>
+
+          <div class="odds-table">
+            <div><span id="oddsALabel">1</span><strong id="oddsA">--</strong></div>
+            <div><span id="oddsDLabel">X</span><strong id="oddsD">--</strong></div>
+            <div><span id="oddsBLabel">2</span><strong id="oddsB">--</strong></div>
+          </div>
+        </div>
+
+        <div class="view-panel" data-panel="deep">
+          <div class="signal-grid">
+            <div><span>AI 信心</span><strong id="aiConfidence">--</strong></div>
+            <div><span>市场偏差</span><strong id="marketEdge">--</strong></div>
+            <div><span>波动风险</span><strong id="riskLevel">--</strong></div>
+            <div><span id="paceLabel">比赛节奏</span><strong id="paceValue">--</strong></div>
+          </div>
+
+          <div class="analysis-box advanced">
+            <div class="analysis-title">
+              <h3>AI 深度分析</h3>
+              <span id="modelTag">Market + AI Model</span>
+            </div>
+            <p id="analysisText">选择左侧比赛后生成分析。</p>
+            <ul id="factorList" class="factor-list"></ul>
+          </div>
+        </div>
+
+        <div class="view-panel" data-panel="settings">
+          <div class="analysis-box settings-note">
+            <h3>设置说明</h3>
+            <p>这里放模型设置，主页面不会一直往下拉。调整后会马上重新计算当前比赛。</p>
+          </div>
+          <div class="tuner">
+            <h3>调整模型</h3>
+            <label for="attackSlider">进攻节奏 <output id="attackOut">1.00</output></label>
+            <input id="attackSlider" type="range" min="0.75" max="1.35" value="1" step="0.01">
+            <label for="drawSlider">平局倾向 <output id="drawOut">1.00</output></label>
+            <input id="drawSlider" type="range" min="0.75" max="1.35" value="1" step="0.01">
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    <span>预测不是投注建议。赛程、赔率和预计结束时间会随数据自动更新。</span>
+    <a href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/scores-fixtures" target="_blank" rel="noreferrer">FIFA 赛程</a>
+    <a href="https://www.nba.com/schedule" target="_blank" rel="noreferrer">NBA 赛程</a>
+    <a href="https://www.espn.com/" target="_blank" rel="noreferrer">ESPN 数据</a>
+  </footer>
+
+  <script src="./app.js?v=3"></script>
+</body>
+</html>
